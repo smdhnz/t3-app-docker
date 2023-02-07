@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_CLIENTVAR: "clientvar"
+    working_dir: /app
+    restart: always
+    ports:
+      - "80:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER}
+      APP_SECRET: ${APP_SECRET}
+      EFFECTIVE_DATETIME: ${EFFECTIVE_DATETIME}
+    logging:
+      driver: json-file
+      options:
+        max-file: '1'
+        max-size: 1m
+    depends_on:
+      prisma:
+        condition: service_completed_successfully
+
+  prisma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_CLIENTVAR: "clientvar"
+      target: migrate
+    working_dir: /app
+    command: sh -c "yarn prisma migrate deploy && yarn tsx seed"
+    environment:
+      DATABASE_URL: ${DATABASE_URL_DOCKER}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+        TZ: ${TZ}
+        LANG: ${LANG}
+        POSTGRES_DB: ${APP_NAME}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - volume:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-file: '1'
+        max-size: 1m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  volume:
+    name: ${APP_NAME}-data
+
