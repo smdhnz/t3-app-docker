@@ -23,7 +23,6 @@ export const useHook = () => {
     mutate(data, {
       onSuccess: ({ token }) => {
         setCookie(null, "token", token);
-        reset();
         router.replace("/").catch((e) => console.log(e));
       },
       onError: ({ message }) => {

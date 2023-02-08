@@ -18,7 +18,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <MantineProvider
         withGlobalStyles
         withNormalizeCSS
-        theme={{ colorScheme: "light" }}
+        theme={{
+          colorScheme: "light",
+          defaultRadius: "md",
+        }}
       >
         <NotificationsProvider position="top-center">
           <Component {...pageProps} />
