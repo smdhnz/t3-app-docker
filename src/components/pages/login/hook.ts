@@ -1,11 +1,11 @@
 import type { z } from "zod";
 import { setCookie } from "nookies";
 import { useRouter } from "next/router";
-import { showNotification } from "@mantine/notifications";
 
 import { api } from "../../../utils/api";
 import { useZodForm } from "../../../hooks";
 import { loginSchema } from "../../../zodSchema";
+import { errorNotice } from "../../../utils/notification";
 
 type LoginSchema = z.infer<typeof loginSchema>;
 
@@ -16,21 +16,19 @@ export const useHook = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useZodForm({ schema: loginSchema });
 
   const onSubmit = (data: LoginSchema) =>
     mutate(data, {
       onSuccess: ({ token }) => {
         setCookie(null, "token", token);
+        reset();
         router.replace("/").catch((e) => console.log(e));
       },
       onError: ({ message }) => {
-        console.error(message);
-        showNotification({
-          title: "Error",
-          message,
-          color: "red",
-        });
+        errorNotice(message);
+        reset({ password: "" });
       },
     });
 
