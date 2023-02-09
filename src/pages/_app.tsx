@@ -1,11 +1,16 @@
 import type { AppType } from "next/app";
 import Head from "next/head";
-import { MantineProvider } from "@mantine/core";
+import { useRouter } from "next/router";
+import { MantineProvider, Flex } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 
+import { Navbar } from "../components/ui";
+import { navLinks } from "../navLinks";
 import { api } from "../utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -24,7 +29,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         }}
       >
         <NotificationsProvider position="top-center">
-          <Component {...pageProps} />
+          <Flex>
+            {router.pathname === "/login" ? null : (
+              <Navbar navLinks={navLinks} />
+            )}
+            <Component {...pageProps} />
+          </Flex>
         </NotificationsProvider>
       </MantineProvider>
     </>

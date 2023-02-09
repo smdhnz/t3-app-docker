@@ -13,7 +13,7 @@ export const Login = () => {
   const { register, handleSubmit, errors } = useHook();
 
   return (
-    <Center h="100vh">
+    <Center h="100vh" w="100vw">
       <form onSubmit={handleSubmit}>
         <Stack align="flex-start">
           <Title>Title</Title>
